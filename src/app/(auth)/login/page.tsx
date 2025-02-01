@@ -7,7 +7,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function LoginPage() {
   return (
-    <main className="grid place-items-center flex-1 bg-white/5 pb-16 w-full px-4">
+    <main className="grid place-items-center px-4">
       <LoginPageUI />
     </main>
   );

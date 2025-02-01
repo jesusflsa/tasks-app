@@ -19,3 +19,9 @@ body {
   background: var(--background);
   font-family: var(--font-poppins);;
 }
+
+main {
+  flex: 1;
+  background-color: #171717;
+  width: 100%;
+}
