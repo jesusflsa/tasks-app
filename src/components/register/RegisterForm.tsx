@@ -6,20 +6,28 @@ import { Field, Label, Input, Button } from "@headlessui/react";
 import clsx from "clsx";
 
 import { registerAction } from "@/lib/auth/actions";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ErrorType, UserType } from "@/lib/types";
 
 export default function RegisterForm() {
   const { auth } = useAuth();
   const [state, userAction, isPending] = useActionState(registerAction, auth);
+  const [errorState, setErrorState] = useState<ErrorType | undefined>(undefined);
 
   const router = useRouter();
 
   useEffect(() => {
-    if (state?.username) {
-      router.push("/");
-    }
+    const userState = state as UserType;
+        const errorState = state as ErrorType;
+        if (userState?.username) {
+          router.push("/");
+        }
+    
+        if (errorState?.errors) {
+          setErrorState(errorState);
+        }
   }, [router, state]);
 
   return (
@@ -45,8 +53,8 @@ export default function RegisterForm() {
           name="tasks-username"
           autoComplete="off"
         />
-        {state?.errors?.username && (
-          <p className="text-xs text-red-500">{state.errors.username}</p>
+        {errorState?.errors?.username && (
+          <p className="text-xs text-red-500">{errorState.errors.username}</p>
         )}
       </Field>
       <Field className="space-y-2">
@@ -60,8 +68,8 @@ export default function RegisterForm() {
           type="email"
           autoComplete="off"
         />
-        {state?.errors?.email && (
-          <p className="text-xs text-red-500">{state.errors.email}</p>
+        {errorState?.errors?.email && (
+          <p className="text-xs text-red-500">{errorState.errors.email}</p>
         )}
       </Field>
       <Field className="space-y-2">
@@ -77,8 +85,8 @@ export default function RegisterForm() {
           name="tasks-password"
           autoComplete="off"
         />
-        {state?.errors?.password && (
-          <p className="text-xs text-red-500">{state.errors.password}</p>
+        {errorState?.errors?.password && (
+          <p className="text-xs text-red-500">{errorState.errors.password}</p>
         )}
       </Field>
       <p className="text-sm">
@@ -94,8 +102,8 @@ export default function RegisterForm() {
       >
         {isPending ? "Registrándote..." : "Regístrate"}
       </Button>
-      {state?.errors?.unknown && !isPending && (
-        <p className="text-sm text-red-500">{state.errors.unknown}</p>
+      {errorState?.errors?.unknown && !isPending && (
+        <p className="text-sm text-red-500">{errorState.errors.unknown}</p>
       )}
     </form>
   );

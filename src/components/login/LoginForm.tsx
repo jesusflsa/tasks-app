@@ -4,18 +4,28 @@ import { Field, Label, Input, Button } from "@headlessui/react";
 import clsx from "clsx";
 
 import { loginAction } from "@/lib/auth/actions";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ErrorType, UserType } from "@/lib/types";
 
 export default function LoginForm() {
   const { auth } = useAuth();
   const [state, userAction, isPending] = useActionState(loginAction, auth);
+  const [errorState, setErrorState] = useState<ErrorType | undefined>(undefined);
 
   const router = useRouter();
 
   useEffect(() => {
-    if (state?.username) { router.push("/"); }
+    const userState = state as UserType;
+    const errorState = state as ErrorType;
+    if (userState?.username) {
+      router.push("/");
+    }
+
+    if (errorState?.errors) {
+      setErrorState(errorState);
+    }
   }, [router, state]);
 
   return (
@@ -40,8 +50,8 @@ export default function LoginForm() {
           name="tasks-username"
           autoComplete="off"
         />
-        {state?.errors?.username && !isPending && (
-          <p className="text-sm text-red-500">{state?.errors.username}</p>
+        {errorState?.errors?.username && !isPending && (
+          <p className="text-sm text-red-500">{errorState?.errors.username}</p>
         )}
       </Field>
       <Field className="space-y-2">
@@ -57,8 +67,8 @@ export default function LoginForm() {
           name="tasks-password"
           autoComplete="off"
         />
-        {state?.errors?.password && !isPending && (
-          <p className="text-sm text-red-500">{state.errors.password}</p>
+        {errorState?.errors?.password && !isPending && (
+          <p className="text-sm text-red-500">{errorState.errors.password}</p>
         )}
       </Field>
       <p className="text-sm">
@@ -74,8 +84,8 @@ export default function LoginForm() {
       >
         {isPending ? "Iniciando sesión..." : "Iniciar sesión"}
       </Button>
-      {state?.errors?.unknown && !isPending && (
-        <p className="text-sm text-red-500">{state.errors.unknown}</p>
+      {errorState?.errors?.unknown && !isPending && (
+        <p className="text-sm text-red-500">{errorState.errors.unknown}</p>
       )}
     </form>
   );
